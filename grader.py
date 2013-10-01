@@ -13,6 +13,7 @@
 # -- Allow modifiable score.  For now it is only binary.
 
 import os
+import glob
 import logging
 import mimetypes
 from subprocess import call
@@ -20,13 +21,14 @@ from subprocess import call
 ASSIGNMENT_DIR = "HW0"  # TODO(awdavies) Make this a param.
 EXPECTED_MIMETYPE = ('application/x-tar', 'gzip')
 
-def all_dirs(directory):
+def get_dirs(directory):
   '''
-  Generates all directories within a specified directory.
+  Generates all directories within a specified directory one level deep.
   '''
-  for path, dirs, files in os.walk(directory):
-    for d in dirs:
-      yield os.path.join(path, d)
+  files = glob.glob("{0}/*".format(directory))
+  for d in filter(lambda f: os.path.isdir(f), files):
+    yield d
+
 
 def all_files(directory):
   '''
@@ -95,7 +97,7 @@ def main():
   # For each folder in the root directory, assumes the
   # directory under will be the UW Netid of the next
   # person to be graded.
-  for d in all_dirs(ASSIGNMENT_DIR):
+  for d in get_dirs(ASSIGNMENT_DIR):
     netid = os.path.basename(d)
     grade(netid, d)
 
