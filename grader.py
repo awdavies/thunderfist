@@ -46,6 +46,10 @@ def extract_assignment(path):
   Returns:
       False -- If the file could not be extracted.
       True -- If the file could be extracted and built.
+
+  TODO(awdavies) Add in some sort of brute force way of extracting files.
+  we should be able to extract anything, even if the format is wrong (because
+  it WILL be wrong).
   '''
   try:
     tar_file = None
@@ -72,7 +76,8 @@ def build_assignment(path):
   path. Make sure that extract_assignment was first run.
 
   TODO(awdavies) In the event that there is no Makefile AND there is only
-  one C file, run a generic compilation command (or something).
+  one C file, run a generic command.  Else run a command as provided in
+  some sort of grade-config file (packaged with the assignments).
 
   Returns:
     False -- If the build failed in some way.
