@@ -45,6 +45,8 @@ def parse_options():
       )
   options, arguments = p.parse_args()
 
+  # The program will not run without a config
+  # or a directory.
   if not options.config or not options.directory:
     p.print_help()
     sys.exit(1)
@@ -92,7 +94,7 @@ def main():
   # directory under will be the UW Netid of the next
   # person to be graded.
   opts, args = parse_options()
-  _init_logging(opts.log)  # TODO(awdavies) Parse logging options.
+  _init_logging(opts.log)
   for d in util.get_dirs(opts.directory):
     netid = os.path.basename(d)
     grade(netid, d)
