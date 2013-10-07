@@ -15,10 +15,13 @@
 # -- Parse the commands to run/regexes to check against.
 
 import glob
+import io_util as util
+import logging
 import os
 import optparse
-import io_util as util
 import sys
+
+DEFAULT_LOG = "log.log"
 
 def parse_options():
   # Creates an instance of OptionParser Module.
@@ -32,7 +35,13 @@ def parse_options():
   p.add_option(
       '--directory', 
       '-D', 
-      help='Assignment directory'
+      help='Assignment directory',
+      )
+  p.add_option(
+      '--log',
+      '-l',
+      help="Path to log file",
+      default=DEFAULT_LOG,
       )
   options, arguments = p.parse_args()
 
@@ -72,11 +81,18 @@ def grade(netid, path):
   # Prints the username and the score.
   print("SCORE: {0} -- {1}".format(netid, score))
 
+def _init_logging(log=DEFAULT_LOG):
+  '''
+  Initializes the log files.
+  '''
+  logging.basicConfig(filename=log, level=logging.INFO)
+
 def main():
   # For each folder in the root directory, assumes the
   # directory under will be the UW Netid of the next
   # person to be graded.
   opts, args = parse_options()
+  _init_logging(opts.log)  # TODO(awdavies) Parse logging options.
   for d in util.get_dirs(opts.directory):
     netid = os.path.basename(d)
     grade(netid, d)
