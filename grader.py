@@ -13,15 +13,33 @@
 # -- Allow modifiable score.  For now it is only binary.
 #
 # -- Parse the commands to run/regexes to check against.
-#
-# -- Add in command line args a la optparse (or something).
 
-import os
 import glob
+import os
+import optparse
 import io_util as util
-from subprocess import call
+import sys
 
-ASSIGNMENT_DIR = "TEST"  # TODO(awdavies) Make this a param.
+def parse_options():
+  # Creates an instance of OptionParser Module.
+  p = optparse.OptionParser(
+      description='Autograder for cse333',
+      prog='grader.py',
+      version='0.1a',
+      usage= '%prog [assignment_dir] [config_file]',
+      )
+  p.add_option('--config','-c', help='Config file')
+  p.add_option(
+      '--directory', 
+      '-D', 
+      help='Assignment directory'
+      )
+  options, arguments = p.parse_args()
+
+  if not options.config or not options.directory:
+    p.print_help()
+    sys.exit(1)
+  return options, arguments
 
 def build_assignment(path):
   '''
@@ -58,7 +76,8 @@ def main():
   # For each folder in the root directory, assumes the
   # directory under will be the UW Netid of the next
   # person to be graded.
-  for d in util.get_dirs(ASSIGNMENT_DIR):
+  opts, args = parse_options()
+  for d in util.get_dirs(opts.directory):
     netid = os.path.basename(d)
     grade(netid, d)
 
