@@ -11,64 +11,17 @@
 # -- Support a list of regexes, with point values.
 #
 # -- Allow modifiable score.  For now it is only binary.
+#
+# -- Parse the commands to run/regexes to check against.
+#
+# -- Add in command line args a la optparse (or something).
 
 import os
 import glob
-import logging
-import mimetypes
+import io_util as util
 from subprocess import call
 
-ASSIGNMENT_DIR = "HW0"  # TODO(awdavies) Make this a param.
-EXPECTED_MIMETYPE = ('application/x-tar', 'gzip')
-
-def get_dirs(directory):
-  '''
-  Generates all directories within a specified directory one level deep.
-  '''
-  files = glob.glob("{0}/*".format(directory))
-  for d in filter(lambda f: os.path.isdir(f), files):
-    yield d
-
-
-def all_files(directory):
-  '''
-  Generates all files within a specified directory.
-  '''
-  for path, dirs, files in os.walk(directory):
-    for f in files:
-      yield os.path.join(path, f)
-
-def extract_assignment(path):
-  '''
-  Attempts to extract from a tar file from the path.
-  Assumes there is only one tar file.
-
-  Returns:
-      False -- If the file could not be extracted.
-      True -- If the file could be extracted and built.
-
-  TODO(awdavies) Add in some sort of brute force way of extracting files.
-  we should be able to extract anything, even if the format is wrong (because
-  it WILL be wrong).
-  '''
-  try:
-    tar_file = None
-    for f in all_files(path):
-      mime = mimetypes.guess_type(f)
-      if mime != EXPECTED_MIMETYPE:
-        print("OH NOES!  {0}".format(f))
-      else:
-        tar_file = f
-    if not tar_file:
-      return False
-    # Extract the file!
-    rs = call(["tar", "xvf", tar_file, "-C", path])
-  except:
-    print("ERR: Running tar command")
-    return False
-  if rs != 0:
-    return False
-  return True
+ASSIGNMENT_DIR = "TEST"  # TODO(awdavies) Make this a param.
 
 def build_assignment(path):
   '''
@@ -83,6 +36,7 @@ def build_assignment(path):
     False -- If the build failed in some way.
     True -- If the build succeeded.
   '''
+  return False
 
 def grade(netid, path):
   '''
@@ -90,19 +44,21 @@ def grade(netid, path):
   If the outputs do not match, then an error logged and the user
   receives no points.
   '''
-  if extract_assignment(path) or build_assignment(path):
-    score = 1
-  else:
-    score = 0
+  print("GRADING: {0}".format(netid))
+
+  score = 0
+  for f in util.all_files(path):
+    if util.extract_files(f, path) or build_assignment(path):
+      score = 1
 
   # Prints the username and the score.
-  print("{0} -- {1}".format(netid, score))
+  print("SCORE: {0} -- {1}".format(netid, score))
 
 def main():
   # For each folder in the root directory, assumes the
   # directory under will be the UW Netid of the next
   # person to be graded.
-  for d in get_dirs(ASSIGNMENT_DIR):
+  for d in util.get_dirs(ASSIGNMENT_DIR):
     netid = os.path.basename(d)
     grade(netid, d)
 
