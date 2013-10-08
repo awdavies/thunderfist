@@ -14,6 +14,7 @@
 #
 # -- Parse the commands to run/regexes to check against.
 
+import config
 import glob
 import io_util as util
 import logging
@@ -67,7 +68,7 @@ def build_assignment(path):
   '''
   return False
 
-def grade(netid, path):
+def grade(netid, path, grader):
   '''
   Grades the assignment based on the expected outputs.
   If the outputs do not match, then an error logged and the user
@@ -95,9 +96,13 @@ def main():
   # person to be graded.
   opts, args = parse_options()
   _init_logging(opts.log)
+  grader = config.create_grader(opts.config_file)
+  if grader is None:
+    ''' TODO(awdavies) Handle this as an error once the parser is implemented. '''
+    pass
   for d in util.get_dirs(opts.directory):
     netid = os.path.basename(d)
-    grade(netid, d)
+    grade(netid, d, grader)
 
 if __name__ == '__main__':
   main()
