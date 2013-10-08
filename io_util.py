@@ -61,7 +61,7 @@ def extract_files(file_name, path):
       if rs == 0:
         print("[ Success ]")
         break
-    except CalledProcessError as e:
+    except Exception as e:
       print("ERR: Running extract command.")
     print("[ Failure ]") 
   if rs != 0:
