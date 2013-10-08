@@ -53,21 +53,6 @@ def parse_options():
     sys.exit(1)
   return options, arguments
 
-def build_assignment(path):
-  '''
-  Attempts to build from the source directory specified in the
-  path. Make sure that extract_assignment was first run.
-
-  TODO(awdavies) In the event that there is no Makefile AND there is only
-  one C file, run a generic command.  Else run a command as provided in
-  some sort of grade-config file (packaged with the assignments).
-
-  Returns:
-    False -- If the build failed in some way.
-    True -- If the build succeeded.
-  '''
-  return False
-
 def grade(netid, path, grader):
   '''
   Grades the assignment based on the expected outputs.
@@ -78,7 +63,7 @@ def grade(netid, path, grader):
 
   score = 0
   for f in util.all_files(path):
-    if util.extract_files(f, path) or build_assignment(path):
+    if util.extract_files(f, path) or grader.grade(path):
       score = 1
 
   # Prints the username and the score.
@@ -96,10 +81,10 @@ def main():
   # person to be graded.
   opts, args = parse_options()
   _init_logging(opts.log)
-  grader = config.create_grader(opts.config_file)
+  grader = config.create_grader(opts.config)
   if grader is None:
-    ''' TODO(awdavies) Handle this as an error once the parser is implemented. '''
-    pass
+    print("[Err] Could not initialize grader.  Exiting. . .")
+    sys.exit(1)
   for d in util.get_dirs(opts.directory):
     netid = os.path.basename(d)
     grade(netid, d, grader)
