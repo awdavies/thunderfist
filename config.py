@@ -7,6 +7,11 @@
 #
 # TODO(awdavies) Perhaps just raise an exception in the event of a failed
 # config file parse.
+#
+# TODO(awdavies) It might be a better idea to offload the options parsed in
+# the main module into the config parser.  This way we can supply multiple
+# grading directories/log files, etc etc.
+import ConfigParser
 
 class _Grader:
   """
@@ -63,4 +68,17 @@ def create_grader(config_file):
   Grader -- In the event of a successfully parsed config file.
   None   -- In the event that parsing the config file fails for some reason.
   '''
+  parser = ConfigParser.SafeConfigParser()
+  parser.read(config_file)
+  try:
+    # TODO(awdavies) This should be expanded to contain more params.
+    # right now this is really for testing.
+    grader = _Grader(
+      build_cmd=parser.get("Builder", "cmd").split(','),
+      run_cmd=parser.get("Grader", "cmd").split(','),
+      regexes=parser.get("Grader", "regexes"),
+    )
+    return grader
+  except:
+    return None
   return None
