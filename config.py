@@ -18,7 +18,8 @@ import ConfigParser
 import logging
 import traceback
 import os
-from subprocess import call
+import re
+from subprocess import call, Popen, PIPE
 
 logger = logging.getLogger(__name__)
 
@@ -83,8 +84,6 @@ class _Grader:
 
   def grade(self, path):
     '''
-    NOT IMPLEMENTED
-    
     Goes to the path in question and runs the commands, comparing the output to
     the regexes in question.
 
@@ -100,8 +99,17 @@ class _Grader:
       return False
     binary = os.path.join(path, self.run_cmd[0])
     args = self.run_cmd[1:]
-    print [binary] + args
-    return call([binary] + args)
+
+    # Run the binary with some arguments.
+    process = Popen([binary] + args, stdout=PIPE)
+    output = process.communicate()[0]
+
+    # Check the output against regexes.
+    for regex in self.regexes:
+      if re.match(regex, output):
+        return 1
+    print "NO REGEX MATCH -- FAILURE"
+    return 0
 
 def create_grader(config_file):
   '''
@@ -121,7 +129,7 @@ def create_grader(config_file):
     grader = _Grader(
       build_cmd=parser.get("Builder", "cmd").split(','),
       run_cmd=parser.get("Grader", "cmd").split(','),
-      regexes=parser.get("Grader", "regex"),
+      regexes=[parser.get("Grader", "regex")],
       out_file=parser.get("Builder", "out_file"),
     )
   except Exception as e:
