@@ -14,6 +14,10 @@
 #
 # TODO(awdavies) Convert this to work with shlex, as we can make more complex
 # config file commands that parse securely (or so the python library says....)
+#
+# TODO(awdavies) In the event that all of the gradable material is inside of a
+# dir, then we need to go into it in order to build.  This todo might be good
+# in a different file.
 import ConfigParser
 import logging
 import traceback
