@@ -69,7 +69,6 @@ def extract_files(file_name, path):
         print("[ Success ]")
         break
       else:
-        logger.error(out)
         logger.error(out[1])
         print("[ Failure ]") 
     except Exception as e:

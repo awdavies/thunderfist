@@ -85,12 +85,13 @@ class _Grader:
     if res is None or res is '':
       call(["chmod", "755", self.out_file])
       print "\t\t\t[ Success ]\n"
+      self.dir_switcher.ret()
+      return 0
     else:
       logger.error(res)
-      logger.error(path)
       print "\t\t\t[ Failure ]\b"
-    self.dir_switcher.ret()
-    return res
+      self.dir_switcher.ret()
+      return 1
 
   def grade(self, path):
     '''
