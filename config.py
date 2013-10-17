@@ -58,16 +58,16 @@ class _Grader:
   This class should not need to be instantiated.  The grader will be created
   by the factory method in this module.
   """
-  def __init__(self, build_cmd=None, run_cmd=None, regexes=None):
+  def __init__(self,
+      build_cmd=None, run_cmd=None, regexes=None, out_file=None):
     self.build_cmd = build_cmd
     self.run_cmd = run_cmd
     self.regexes = regexes
     self.dir_switcher = _DirSwitcher()
+    self.out_file = out_file
 
   def _build(self, path):
     '''
-    NOT IMPLEMENTED
-
     Goes to the path in question and runs the build command, returning the
     result of said command.
 
@@ -76,6 +76,8 @@ class _Grader:
     '''
     self.dir_switcher.go(path) 
     res = call(self.build_cmd)
+    if res == 0:
+      res = call(["chmod", "755", self.out_file])
     self.dir_switcher.ret()
     return res
 
@@ -120,6 +122,7 @@ def create_grader(config_file):
       build_cmd=parser.get("Builder", "cmd").split(','),
       run_cmd=parser.get("Grader", "cmd").split(','),
       regexes=parser.get("Grader", "regex"),
+      out_file=parser.get("Builder", "out_file"),
     )
   except Exception as e:
     logger.error("Could not initialize grader.")

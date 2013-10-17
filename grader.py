@@ -63,9 +63,9 @@ def grade(netid, path, grader):
 
   score = 0
   for f in util.all_files(path):
-    if util.extract_files(f, path) or grader.grade(path):
-      score = 1
-
+    if util.extract_files(f, path):
+      break
+  score = grader.grade(path)
   # Prints the username and the score.
   print("SCORE: {0} -- {1}".format(netid, score))
 
