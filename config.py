@@ -75,10 +75,16 @@ class _Grader:
     Returns the result of the build command in the form of an integer (it's 
     the exit code of the program).
     '''
+
+    print "  BUILDING",
+
     self.dir_switcher.go(path) 
     res = call(self.build_cmd)
     if res == 0:
       res = call(["chmod", "755", self.out_file])
+      print "\t\t\t[ Success ]\n"
+    else:
+      print "\t\t\t[ Failure ]\b"
     self.dir_switcher.ret()
     return res
 
@@ -104,11 +110,14 @@ class _Grader:
     process = Popen([binary] + args, stdout=PIPE)
     output = process.communicate()[0]
 
+    print "  GRADING. . .\n"
+
     # Check the output against regexes.
     for regex in self.regexes:
       if re.match(regex, output):
+        print "    MATCH FOUND ON: {0}\n".format(regex)
         return 1
-    print "NO REGEX MATCH -- FAILURE"
+    print "    NO MATCH -- FAILURE\n"
     return 0
 
 def create_grader(config_file):

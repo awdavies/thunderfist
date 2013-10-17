@@ -9,7 +9,10 @@ import os
 import glob
 import logging
 import mimetypes
-from subprocess import call
+import traceback
+from subprocess import call, Popen, PIPE
+
+logger = logging.getLogger(__name__)
 
 # A list of extractor functions that can be passed to the 
 # "call" command.  The elements in the extractor list are lambdas
@@ -54,16 +57,27 @@ def extract_files(file_name, path):
   rs = 1
 
   # Attempt to extract the file!
+  print "  EXTRACTING -- {0}\n".format(file_name)
   for fn_name, ex_fn in EXTRACTORS.iteritems():
-    print("---- Attempting {0} ----".format(fn_name))
+    print "    Attempting {0}\t\t".format(fn_name),
+    tb = None
     try:
-      rs = call(ex_fn(file_name, path))
-      if rs == 0:
+      proc = Popen(ex_fn(file_name, path), stdout=PIPE, stderr=PIPE)
+      out = proc.communicate()
+      if rs is None:
         print("[ Success ]")
         break
+      else:
+        logger.error(out[1])
+        print("[ Failure ]") 
     except Exception as e:
       print("ERR: Running extract command.")
-    print("[ Failure ]") 
-  if rs != 0:
-    return False
-  return True
+      tb = traceback.format_exc()
+      print("[ Failure ]") 
+    finally:
+      if tb is not None:
+        logger.error(str(tb))
+  print ""
+  if rs is None:
+    return True
+  return False

@@ -59,7 +59,7 @@ def grade(netid, path, grader):
   If the outputs do not match, then an error logged and the user
   receives no points.
   '''
-  print("GRADING: {0}".format(netid))
+  print("[------- GRADING: {0} -------]".format(netid))
 
   score = 0
   for f in util.all_files(path):
@@ -67,7 +67,8 @@ def grade(netid, path, grader):
       break
   score = grader.grade(path)
   # Prints the username and the score.
-  print("SCORE: {0} -- {1}".format(netid, score))
+  print("[------- SCORE: {0} -- {1} -------]".format(netid, score))
+  print("")
 
 def _init_logging(log=DEFAULT_LOG):
   '''
