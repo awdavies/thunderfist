@@ -78,12 +78,16 @@ class _Grader:
 
     print "  BUILDING",
 
-    self.dir_switcher.go(path) 
-    res = call(self.build_cmd)
-    if res == 0:
-      res = call(["chmod", "755", self.out_file])
+    self.dir_switcher.go(path)
+    proc = Popen(self.build_cmd, stdout=PIPE, stderr=PIPE)
+    out = proc.communicate()
+    res = out[1]
+    if res is None or res is '':
+      call(["chmod", "755", self.out_file])
       print "\t\t\t[ Success ]\n"
     else:
+      logger.error(res)
+      logger.error(path)
       print "\t\t\t[ Failure ]\b"
     self.dir_switcher.ret()
     return res

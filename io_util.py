@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 #
 # Also feel free to edit the arguments to your liking.
 EXTRACTORS = {
-    "TAR_GZ": lambda f_name, path: ["tar", "xf", f_name, "-C", path],
+    "TAR": lambda f_name, path: ["tar", "xvf", f_name, "-C", path],
     "ZIP": lambda f_name, path: ["unzip", f_name, "-d", path],
 }
 
@@ -54,7 +54,7 @@ def extract_files(file_name, path):
       False -- If the file could not be extracted.
       True -- If the file could be extracted and built.
   '''
-  rs = 1
+  rs = None
 
   # Attempt to extract the file!
   print "  EXTRACTING -- {0}\n".format(file_name)
@@ -64,10 +64,12 @@ def extract_files(file_name, path):
     try:
       proc = Popen(ex_fn(file_name, path), stdout=PIPE, stderr=PIPE)
       out = proc.communicate()
-      if rs is None:
+      rs = out[1]
+      if rs is None or rs is '':
         print("[ Success ]")
         break
       else:
+        logger.error(out)
         logger.error(out[1])
         print("[ Failure ]") 
     except Exception as e:
@@ -78,6 +80,6 @@ def extract_files(file_name, path):
       if tb is not None:
         logger.error(str(tb))
   print ""
-  if rs is None:
+  if rs is None or rs is '':
     return True
   return False
